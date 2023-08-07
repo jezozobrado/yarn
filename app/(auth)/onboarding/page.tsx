@@ -6,6 +6,7 @@ type Props = {};
 
 const page = async (props: Props) => {
   const user = await currentUser();
+  console.log(user);
 
   const userInfo = {};
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -31,26 +31,42 @@ interface Props {
   };
   btnTitle: string;
 }
-const AccountProfile = async ({ user, btnTitle }: Props) => {
+const AccountProfile = ({ user, btnTitle }: Props) => {
+  const [files, setFiles] = useState<File[]>([]);
   const form = useForm<z.infer<typeof userSchema>>({
     resolver: zodResolver(userSchema),
     defaultValues: {
-      profile_photo: "",
-      name: "",
-      username: "",
-      bio: "",
+      profile_photo: user?.image || "",
+      name: user?.name || "",
+      username: user?.username || "",
+      bio: user?.bio || "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof userSchema>) {
+  const onSubmit = async (values: z.infer<typeof userSchema>) => {
     console.log(values);
-  }
+  };
 
   const handleImage = (
-    e: ChangeEvent,
+    e: ChangeEvent<HTMLInputElement>,
     fieldChange: (value: string) => void
   ) => {
     e.preventDefault();
+
+    const fileReader = new FileReader();
+
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      setFiles(Array.from(e.target.files));
+
+      if (!file.type.includes("image")) return;
+      fileReader.onload = async (event) => {
+        const imageDataUrl = event.target?.result?.toString() || "";
+        fieldChange(imageDataUrl);
+      };
+
+      fileReader.readAsDataURL(file);
+    }
   };
   return (
     <Form {...form}>
