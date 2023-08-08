@@ -4,7 +4,6 @@ import { revalidatePath } from "next/cache";
 import User from "../models/user.model";
 import Yarn from "../models/yarn.model";
 import { connectToDB } from "../mongoose";
-import { Yanone_Kaffeesatz } from "next/font/google";
 
 interface Params {
   text: string;
@@ -59,4 +58,30 @@ export async function fetchYarns(pageNumber = 1, pageSize = 20) {
 
     return { yarns, isNext };
   } catch (error) {}
+}
+
+export async function fetchYarnById(id: string) {
+  connectToDB();
+  try {
+    // TODO: populate community
+    const yarn = await Yarn.findById(id)
+      .populate({
+        path: "author",
+        model: User,
+        select: "_id id name image",
+      })
+      .populate({
+        path: "children",
+        populate: {
+          path: "author",
+          model: User,
+          select: "_id id name parentId image",
+        },
+      })
+      .exec();
+
+    return yarn;
+  } catch (error: any) {
+    throw new Error(`Error fetching yarnL ${error.message}`);
+  }
 }
