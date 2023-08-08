@@ -35,9 +35,25 @@ const page = async ({ params }: { params: { id: string } }) => {
       <div className="mt-7">
         <Comment
           yarnId={yarn.id}
-          currentUserImg={user.imageUrl}
+          currentUserImg={userInfo.image}
           currentUserId={JSON.stringify(userInfo._id)}
         />
+      </div>
+      <div className="mt-10">
+        {yarn.children.map((child: any) => (
+          <YarnCard
+            key={child._id}
+            id={child._id}
+            currentUserId={user?.id || ""}
+            parentId={child.parentId}
+            content={child.text}
+            author={child.author}
+            createdAt={child.createdAt}
+            comments={child.children}
+            community={child.community}
+            isComment
+          />
+        ))}
       </div>
     </section>
   );
