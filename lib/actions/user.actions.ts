@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import User from "../models/user.model";
 import { connectToDB } from "../mongoose";
+import Yarn from "../models/yarn.model";
 
 interface Params {
   userId?: string;
@@ -48,5 +49,25 @@ export async function fetchUser(userId: string) {
     //   model: Community,
   } catch (error: any) {
     throw new Error(`Failed to fetch user: ${error.message}`);
+  }
+}
+
+export async function fetchUserYarns(userId: string) {
+  connectToDB();
+
+  try {
+    const yarns = await User.findOne({ id: userId }).populate({
+      path: "yarns",
+      model: Yarn,
+      populate: {
+        path: "children",
+        model: Yarn,
+        populate: { path: "author", model: User, select: "name image id" },
+      },
+    });
+
+    return yarns;
+  } catch (error: any) {
+    throw new Error(`Failed to fetch user yarns: ${error.message}`);
   }
 }
