@@ -85,3 +85,33 @@ export async function fetchYarnById(id: string) {
     throw new Error(`Error fetching yarnL ${error.message}`);
   }
 }
+
+export async function addCommentToYarn(
+  yarnId: string,
+  commentText: string,
+  userId: string,
+  path: string
+) {
+  connectToDB();
+
+  try {
+    const originalYarn = await Yarn.findById(yarnId);
+
+    if (!originalYarn) throw new Error("Yarn not found");
+
+    const commentYarn = new Yarn({
+      text: commentText,
+      author: userId,
+      parentId: yarnId,
+    });
+
+    const savedCommentYarn = await commentYarn.save();
+
+    originalYarn.children.push(savedCommentYarn._id);
+
+    await originalYarn.save();
+    revalidatePath(path);
+  } catch (error: any) {
+    throw new Error(`Error adding comment to thread: ${error.message}`);
+  }
+}

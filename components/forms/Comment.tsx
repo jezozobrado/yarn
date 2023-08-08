@@ -15,6 +15,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { z } from "zod";
 import { Input } from "../ui/input";
 import Image from "next/image";
+import { addCommentToYarn } from "@/lib/actions/yarn.actions";
 
 interface Props {
   yarnId: string;
@@ -33,14 +34,13 @@ const Comment = ({ yarnId, currentUserImg, currentUserId }: Props) => {
   });
 
   const onSubmit = async (values: z.infer<typeof commentSchema>) => {
-    // await spinYarn({
-    //   text: values.yarn,
-    //   author: userId,
-    //   communityId: null,
-    //   path: pathname,
-    // });
-
-    router.push("/");
+    await addCommentToYarn(
+      yarnId,
+      values.yarn,
+      JSON.parse(currentUserId),
+      pathname
+    );
+    form.reset();
   };
 
   return (
