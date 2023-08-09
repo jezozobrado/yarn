@@ -124,3 +124,28 @@ export async function fetchUsers({
     throw new Error(`Failed to fetch users: ${error.message}`);
   }
 }
+
+export async function fetchActivities(userId: string) {
+  try {
+    connectToDB();
+
+    const userYarns = await Yarn.find({ author: userId });
+
+    const childYarnIds = userYarns.reduce((acc, userYarn) => {
+      return acc.concat(userYarn.children);
+    }, []);
+
+    const replies = await Yarn.find({
+      _id: { $in: childYarnIds },
+      author: { $ne: userId },
+    }).populate({
+      path: "author",
+      model: User,
+      select: "name image _id",
+    });
+
+    return replies;
+  } catch (error: any) {
+    throw new Error(`Failed to fetch activity: ${error.message}`);
+  }
+}
