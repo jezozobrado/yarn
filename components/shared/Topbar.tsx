@@ -12,10 +12,10 @@ const Topbar = () => {
         <p className="text-heading3-bold text-light-1 max-xs:hidden ">Yarn</p>
       </Link>
       <div className="flex items-center gap-1">
-        <div className="block ">
+        <div className="block md:hidden">
           <SignedIn>
             <SignOutButton>
-              <div className="flex cursor-pointer md:hidden">
+              <div className="flex cursor-pointer">
                 <Image
                   src="/assets/logout.svg"
                   alt="logout"
